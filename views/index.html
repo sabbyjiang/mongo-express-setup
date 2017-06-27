@@ -32,14 +32,14 @@
       <h3>Get Data</h3>
       <a href="/get-data">LOAD DATA</a>
       <div>
-          
+          {{#items}}
               <article class="item">
-                  <div>Title: </div>
-                  <div>Content: </div>
-                  <div>Author: </div>
-                  <div>ID: </div>
+                  <div>Title: {{ title }}</div>
+                  <div>Content: {{ content }} </div>
+                  <div>Author: {{ author }}</div>
+                  <div>ID: {{ _id }} </div>
               </article>
-          
+          {{/items}}
       </div>
   </section>
   <section class="update">
