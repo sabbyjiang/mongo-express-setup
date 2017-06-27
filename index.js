@@ -46,7 +46,7 @@ app.get('/', (req, res) => {
 });
 
 app.get('/get-data', (req, res, next) => {
-  Userdata.find()
+  UserData.find()
     // Returns a promise that finds everything inside this model!
     .then(docs => {
       res.render('index', {items: docs})
@@ -64,6 +64,8 @@ app.post('/insert', (req, res, next) => {
   const data = new UserData(item);
 
   data.save();
+
+  res.redirect('/');
   
 });
 
@@ -81,12 +83,19 @@ app.post('/update', (req, res, next) => {
     doc.content = req.body.content;
     doc.author = req.body.author;
     doc.save();
-  })
+  });
+
+  res.redirect('/');
   
 });
 
 app.post('/delete', (req, res, next) => {
-  const id = req.body.id
+  const id = req.body.id;
+
+  // Finds a doc by id and then executes the remove!
+  UserData.findByIdAndRemove(id).exec();
+
+  res.redirect('/');
 
 })
 
