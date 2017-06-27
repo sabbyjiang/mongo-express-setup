@@ -2,6 +2,7 @@ const express = require('express'),
       app = express(),
       bodyParser = require('body-parser'),
       mongo = require('mongodb').MongoClient,
+      objectID = require('mongodb').ObjectID,
       assert = require('assert'),
       // Port 27017 is the default port
       // test is the database that mongodb ships with
@@ -80,20 +81,53 @@ app.post('/update', (req, res, next) => {
     title: req.body.title,
     content: req.body.content,
     author: req.body.author,
-    id: req.body.id
   };
+
+  // This has to be separate from the rest of the object because you're not rewriting the ID of the document
+  const id = req.body.id
 
   mongo.connect(url, (err, db) => {
     assert.equal(null, err);
 
-    db.collection('user-data').updateOne({"_id": item.id}, (err, result) => {
+    // UpdateOne takes 3 arguments
+    db.collection('user-data').updateOne(
+      // First Arg: however you search for it
+      // In this case we're using ID since we know that is guaranteed to specify one
+      // The ID HAS to be an objectID. Extract this from the mongodb client
+      {"_id": objectID(id)}, 
+      
+      // Specifies what the new data should be
+      {$set: item},
+      (err, result) => {
+        assert.equal(null, err);
+        console.log('item updated');
+        db.close();
 
+        res.redirect('/');
     })
   })
 });
 
 app.post('/delete', (req, res, next) => {
+  const id = req.body.id
 
+  mongo.connect(url, (err, db) => {
+    assert.equal(null, err);
+
+    // UpdateOne takes 2 arguments
+    db.collection('user-data').deleteOne(
+      // First argument is the identifier for document
+      {"_id": objectID(id)}, 
+
+      // Second argument is callback function
+      (err, result) => {
+        assert.equal(null, err);
+        console.log('item deleted');
+        db.close();
+
+        res.redirect('/');
+    })
+  })
 })
 
 app.listen(PORT, () => {
