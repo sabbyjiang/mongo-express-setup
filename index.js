@@ -46,7 +46,11 @@ app.get('/', (req, res) => {
 });
 
 app.get('/get-data', (req, res, next) => {
-  
+  Userdata.find()
+    // Returns a promise that finds everything inside this model!
+    .then(docs => {
+      res.render('index', {items: docs})
+    });
 });
 
 app.post('/insert', (req, res, next) => {
@@ -56,17 +60,28 @@ app.post('/insert', (req, res, next) => {
     author: req.body.author
   };
 
+  // This creates a new variable data which fits everything into our made schema
+  const data = new UserData(item);
+
+  data.save();
   
 });
 
 app.post('/update', (req, res, next) => {
-  const item = {
-    title: req.body.title,
-    content: req.body.content,
-    author: req.body.author,
-  };
 
   const id = req.body.id
+
+  // the id in this case does not need to be a ObjectID like in vanilla mongo! 
+  UserData.findById(id, (err, doc) => {
+    if(err){
+      console.error('error, no entry found');
+    }
+
+    doc.title = req.body.title;
+    doc.content = req.body.content;
+    doc.author = req.body.author;
+    doc.save();
+  })
   
 });
 
